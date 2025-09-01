@@ -10,7 +10,7 @@ export function HotVenues({ venues }: { venues: Venue[] }) {
   return (
     <section className="relative -mt-10 md:-mt-16 z-10">
       <div className="mx-auto max-w-7xl px-5">
-        <div className="bg-white/35 dark:bg-neutral-900/40 backdrop-blur-xl border border-white/30 dark:border-white/10 ring-1 ring-black/5 rounded-3xl p-8 md:p-10 shadow-[0_8px_32px_rgba(0,0,0,0.1)]">
+        <div className="bg-white/85 backdrop-blur-2xl border border-white/30  ring-1 ring-black/5 rounded-3xl p-8 md:p-10 shadow-[0_8px_32px_rgba(0,0,0,0.1)]">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-8">
             <div>
               <h2 className="text-3xl font-semibold tracking-tight">
