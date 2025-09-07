@@ -34,7 +34,7 @@ export function Navbar() {
         <div className="flex items-center gap-4">
           <Authenticated>
             <Button asChild variant="outline" size="sm" className="text-black/80">
-              <Link href="#explore">Book Now</Link>
+              Add Venue
             </Button>
             <UserButton
               appearance={{ elements: { userButtonBox: "text-white/80" } }}

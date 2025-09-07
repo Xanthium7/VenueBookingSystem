@@ -5,7 +5,8 @@ export default defineSchema({
     users: defineTable({
         email: v.string(),
         name: v.string(),
-    }),
+        tokenIdentifier: v.string(),
+    }).index("by_token", ["tokenIdentifier"]),
     venues: defineTable({
         venue_name: v.string(),
         location: v.string(),
