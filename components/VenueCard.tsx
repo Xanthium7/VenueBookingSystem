@@ -10,6 +10,7 @@ export interface Venue {
   venue_name: string;
   venue_image?: Id<"_storage">;
   imageUrl?: string | null;
+  venue_description: string;
   location: string;
   type: string;
   capacity: number;
@@ -65,15 +66,15 @@ export function VenueCard({
           {venue.location}
         </p>
         <p className="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 line-clamp-3">
-          A versatile venue suited for events, workshops, and collaborative
-          sessions. Modern interior, flexible seating, and seamless ambiance for
-          memorable experiences.
+          {venue.venue_description}
         </p>
         <div className="mt-4 flex items-center justify-between">
           <div className="text-sm font-medium text-neutral-700 dark:text-neutral-200">
             Capacity: {venue.capacity}
           </div>
-          <div className="text-sm text-neutral-700 dark:text-neutral-300">{venue.type}</div>
+          <div className="text-sm text-neutral-700 dark:text-neutral-300">
+            {venue.type}
+          </div>
         </div>
         <div className="mt-5 flex gap-3">
           <Button size="sm" className="rounded-full px-5">

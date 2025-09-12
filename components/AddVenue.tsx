@@ -63,7 +63,7 @@ export function AddVenue() {
           Add venue
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] max-h-[70vh] overflow-y-scroll">
         <form
           onSubmit={async (e: FormEvent) => {
             e.preventDefault();
@@ -75,6 +75,9 @@ export function AddVenue() {
             const type = String(formData.get("type") || "");
             const capacity = Number(formData.get("capacity") || 0);
             const location = String(formData.get("location") || "");
+            const venue_description = String(
+              formData.get("venue_description") || ""
+            );
 
             if (!selectedFile) {
               return alert("Please select an image file.");
@@ -97,6 +100,7 @@ export function AddVenue() {
                 type,
                 capacity,
                 location,
+                venue_description,
                 storageId,
               });
 
@@ -167,6 +171,16 @@ export function AddVenue() {
             </div>
 
             <div className="grid gap-3">
+              <Label htmlFor="venue_description">Description</Label>
+              <textarea
+                id="venue_description"
+                name="venue_description"
+                placeholder="Describe the venue, amenities, and suitable events"
+                className="min-h-24 w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 shadow-sm placeholder:text-neutral-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-800 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus-visible:ring-neutral-200"
+              />
+            </div>
+
+            <div className="grid gap-3">
               <Label htmlFor="image">Venue image</Label>
               <input
                 id="image"
@@ -174,14 +188,14 @@ export function AddVenue() {
                 type="file"
                 accept="image/*"
                 onChange={handleFileChange}
-                className="text-sm text-gray-600"
+                className="text-xs px-4 py-2 text-gray-600 border border-[#000] rounded-md bg-secondary cursor-pointer w-1/2 "
               />
               {preview && (
-                <div className="mt-2">
+                <div className="">
                   <img
                     src={preview}
                     alt="preview"
-                    className="w-full h-40 object-cover rounded-md"
+                    className="w-full h-40 object-cover rounded-md my-4"
                   />
                 </div>
               )}
