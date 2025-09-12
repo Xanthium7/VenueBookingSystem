@@ -1,40 +1,18 @@
 "use client";
 
-import { useMemo } from "react";
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { HotVenues } from "@/components/HotVenues";
 import { VenueExplorer } from "@/components/VenueExplorer";
 import { Footer } from "@/components/Footer";
 import { useStoreUserEffect } from "@/hooks/useStoreUserEffect";
-
-// Placeholder venue data (memoized so it doesn't reshuffle each render)
-const generateVenues = () =>
-  Array.from({ length: 20 }).map((_, i) => ({
-    id: i + 1,
-    name: `Venue ${i + 1}`,
-    location: [
-      "Lisbon, Portugal",
-      "Paris, France",
-      "Berlin, Germany",
-      "New York, USA",
-      "Tokyo, Japan",
-      "Rome, Italy",
-    ][i % 6],
-    type: ["Minimalist", "Luxury", "Boutique", "Business"][i % 4],
-    capacity: 50 + (i % 5) * 25,
-    price: 100 + (i % 7) * 20,
-    image: `https://picsum.photos/seed/venue-${i + 1}/600/400`,
-    rating: (3 + (i % 3) + Math.random()).toFixed(1),
-  }));
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 export default function Home() {
-  const venues = useMemo(generateVenues, []);
   const { isLoading, isAuthenticated } = useStoreUserEffect();
-  // const serverVenues = useQuery(api.venues.getVenues);
-  // console.log("serverVenues", serverVenues);
+  const serverVenues = useQuery(api.venues.getVenues);
+  console.log("serverVenues", serverVenues);
 
   return (
     <div className="min-h-screen flex flex-col bg-neutral-100 text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100 font-sans">
@@ -50,8 +28,8 @@ export default function Home() {
         {isAuthenticated && (
           <>
             <Hero />
-            <HotVenues venues={venues} />
-            <VenueExplorer venues={venues} />
+            <HotVenues venues={serverVenues} />
+            <VenueExplorer />
           </>
         )}
       </main>

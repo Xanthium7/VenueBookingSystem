@@ -3,9 +3,14 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import type { Venue } from "./VenueCard";
 import { VenueCard } from "./VenueCard";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
-export function VenueExplorer({ venues }: { venues: Venue[] }) {
+export function VenueExplorer() {
   const [view, setView] = useState<"grid" | "list">("grid");
+  const serverVenues = useQuery(api.venues.getVenues);
+  const data: Venue[] = (serverVenues ?? []) as Venue[];
+
   return (
     <section id="venues" className="mx-auto max-w-7xl px-5 py-20">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-10">
@@ -14,7 +19,7 @@ export function VenueExplorer({ venues }: { venues: Venue[] }) {
             Available Venues
           </h2>
           <p className="text-neutral-500 dark:text-neutral-400 mt-2 max-w-xl">
-            Hand‑picked spaces ready for your next meeting, workshop, or
+            Hand-picked spaces ready for your next meeting, workshop, or
             celebration.
           </p>
         </div>
@@ -41,8 +46,8 @@ export function VenueExplorer({ venues }: { venues: Venue[] }) {
             : "space-y-6"
         )}
       >
-        {venues.map((v) => (
-          <VenueCard key={v.id} venue={v} layout={view} />
+        {data.map((v) => (
+          <VenueCard key={v._id} venue={v} layout={view} />
         ))}
       </div>
     </section>

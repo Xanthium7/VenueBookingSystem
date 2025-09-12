@@ -2,16 +2,18 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { StarRating } from "./StarRating";
+import type { Id } from "@/convex/_generated/dataModel";
 
+// Unified venue shape to support both server (Convex) data and legacy placeholder data
 export interface Venue {
-  id: number;
-  name: string;
+  _id: Id<"venues">;
+  venue_name: string;
+  venue_image?: Id<"_storage">;
+  imageUrl?: string | null;
   location: string;
   type: string;
   capacity: number;
-  price: number;
-  image: string;
-  rating: string; // stored as string originally
+  _creationTime: number;
 }
 
 export function VenueCard({
@@ -21,6 +23,10 @@ export function VenueCard({
   venue: Venue;
   layout: "grid" | "list";
 }) {
+  // Derive display fields for server data
+  const displayName = venue.venue_name;
+  const displayImage = venue.imageUrl ?? "/window.svg";
+
   return (
     <div
       className={cn(
@@ -36,8 +42,8 @@ export function VenueCard({
       >
         {" "}
         <img
-          src={venue.image}
-          alt={venue.name}
+          src={displayImage}
+          alt={displayName}
           className="h-48 w-full object-cover md:h-56 transition-transform duration-500 group-hover:scale-[1.06]"
           loading="lazy"
         />
@@ -50,10 +56,10 @@ export function VenueCard({
       </div>
       <div className="p-5 flex flex-col">
         <h3 className="font-semibold text-lg tracking-tight flex items-center gap-2">
-          {venue.name}
+          {displayName}
         </h3>
         <div className="mt-1">
-          <StarRating rating={Number(venue.rating)} />
+          <StarRating rating={Number(4)} />
         </div>
         <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
           {venue.location}
@@ -67,10 +73,7 @@ export function VenueCard({
           <div className="text-sm font-medium text-neutral-700 dark:text-neutral-200">
             Capacity: {venue.capacity}
           </div>
-          <div className="text-base font-semibold">
-            ${venue.price}
-            <span className="text-xs font-normal text-neutral-500"> /hr</span>
-          </div>
+          <div className="text-sm text-neutral-700 dark:text-neutral-300">{venue.type}</div>
         </div>
         <div className="mt-5 flex gap-3">
           <Button size="sm" className="rounded-full px-5">

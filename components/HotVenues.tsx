@@ -3,10 +3,10 @@ import { Button } from "@/components/ui/button";
 import { StarRating } from "./StarRating";
 import type { Venue } from "./VenueCard";
 
-export function HotVenues({ venues }: { venues: Venue[] }) {
-  const hot = [...venues]
-    .sort((a, b) => Number(b.rating) - Number(a.rating))
-    .slice(0, 6);
+export function HotVenues({ venues }: { venues?: Venue[] }) {
+  const list = venues ?? [];
+  const hot = [...list].slice(0, 3);
+
   return (
     <section className="relative -mt-10 md:-mt-16 z-10">
       <div className="mx-auto max-w-7xl px-5">
@@ -34,16 +34,16 @@ export function HotVenues({ venues }: { venues: Venue[] }) {
             className="flex gap-6 overflow-x-auto pb-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700"
             role="list"
           >
-            {hot.map((v) => (
+      {hot.map((v) => (
               <div
-                key={v.id}
+        key={v._id}
                 role="listitem"
                 className="min-w-[260px] md:min-w-[300px] group rounded-2xl overflow-hidden bg-white/60 dark:bg-neutral-900/50 border border-white/30 dark:border-white/10 backdrop-blur-xl shadow hover:shadow-xl transition-all"
               >
                 <div className="relative">
                   <img
-                    src={v.image}
-                    alt={v.name}
+          src={v.imageUrl ?? "/window.svg"}
+          alt={v.venue_name}
                     className="h-44 w-full object-cover"
                     loading="lazy"
                   />
@@ -54,19 +54,16 @@ export function HotVenues({ venues }: { venues: Venue[] }) {
                 </div>
                 <div className="p-4 flex flex-col">
                   <h3 className="font-semibold tracking-tight text-base">
-                    {v.name}
+                    {v.venue_name}
                   </h3>
                   <div className="mt-1">
-                    <StarRating rating={Number(v.rating)} size={14} />
+                    <StarRating rating={Number(4)} size={14} />
                   </div>
                   <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 line-clamp-2">
                     {v.location}
                   </p>
                   <div className="mt-3 flex items-center justify-between text-sm font-medium">
-                    <span>
-                      ${v.price}
-                      <span className="font-normal text-neutral-500">/hr</span>
-                    </span>
+                    <span className="text-neutral-700 dark:text-neutral-300">{v.type}</span>
                     <Button size="sm" className="rounded-full px-4 h-8">
                       Book
                     </Button>

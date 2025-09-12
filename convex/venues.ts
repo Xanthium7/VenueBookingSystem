@@ -28,6 +28,7 @@ export const addVenue = mutation({
     capacity: v.number(),
     location: v.string(),
     storageId: v.optional(v.id("_storage")),
+    venue_description: v.string(),
   },
   handler: async (ctx, args) => {
     const insertedId = await ctx.db.insert("venues", {
@@ -36,6 +37,7 @@ export const addVenue = mutation({
       location: args.location,
       capacity: args.capacity,
       type: args.type,
+      venue_description: args.venue_description,
     });
 
     return insertedId;

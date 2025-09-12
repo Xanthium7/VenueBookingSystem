@@ -10,6 +10,7 @@ export default defineSchema({
   venues: defineTable({
     venue_name: v.string(),
     venue_image: v.optional(v.id("_storage")),
+    venue_description: v.string(),
     location: v.string(),
     capacity: v.number(),
     type: v.string(),
