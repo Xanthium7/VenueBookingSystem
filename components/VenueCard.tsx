@@ -3,6 +3,20 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { StarRating } from "./StarRating";
 import type { Id } from "@/convex/_generated/dataModel";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 // Unified venue shape to support both server (Convex) data and legacy placeholder data
 export interface Venue {
@@ -17,6 +31,8 @@ export interface Venue {
   _creationTime: number;
 }
 
+// removed invalid top-level hook usage
+
 export function VenueCard({
   venue,
   layout,
@@ -24,9 +40,37 @@ export function VenueCard({
   venue: Venue;
   layout: "grid" | "list";
 }) {
+  const [open, setOpen] = useState(false);
+  const [bookingDate, setBookingDate] = useState<string>(new Date().toISOString().slice(0, 10)); // YYYY-MM-DD
+  const [startTime, setStartTime] = useState<string>("09:00");
+  const [hours, setHours] = useState<number>(1);
+  const [isBooking, setIsBooking] = useState(false);
+  const bookVenue = useMutation(api.venues.bookVenue);
+
   // Derive display fields for server data
   const displayName = venue.venue_name;
   const displayImage = venue.imageUrl ?? "/window.svg";
+
+  const today = new Date();
+  const todayStr = today.toISOString().slice(0, 10);
+
+  const submitBooking = async () => {
+    setIsBooking(true);
+    try {
+      await bookVenue({
+        venue_id: venue._id,
+        booking_date: bookingDate,
+        start_time: startTime,
+        hours,
+      });
+      setOpen(false);
+    } catch (e) {
+      console.error(e);
+      alert("Booking failed");
+    } finally {
+      setIsBooking(false);
+    }
+  };
 
   return (
     <div
@@ -77,9 +121,66 @@ export function VenueCard({
           </div>
         </div>
         <div className="mt-5 flex gap-3">
-          <Button size="sm" className="rounded-full px-5">
-            Book
-          </Button>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" className="rounded-full px-5">
+                Book
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[420px]">
+              <DialogHeader>
+                <DialogTitle>Book {displayName}</DialogTitle>
+                <DialogDescription>
+                  Select a future date, start time, and duration.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-2">
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium">Date</label>
+                  <Input
+                    type="date"
+                    value={bookingDate}
+                    min={todayStr}
+                    onChange={(e) => setBookingDate(e.target.value)}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium">Start Time</label>
+                  <Input
+                    type="time"
+                    value={startTime}
+                    onChange={(e) => setStartTime(e.target.value)}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium">Hours</label>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={12}
+                    value={hours}
+                    onChange={(e) => setHours(Number(e.target.value))}
+                  />
+                </div>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                  Past dates are disabled. Add validation for availability later.
+                </p>
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline" disabled={isBooking}>
+                    Cancel
+                  </Button>
+                </DialogClose>
+                <Button
+                  onClick={submitBooking}
+                  disabled={isBooking || bookingDate < todayStr}
+                >
+                  {isBooking ? "Booking..." : "Confirm"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
           <Button size="sm" variant="outline" className="rounded-full px-5">
             Details
           </Button>

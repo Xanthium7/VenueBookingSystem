@@ -43,3 +43,33 @@ export const addVenue = mutation({
     return insertedId;
   },
 });
+
+export const bookVenue = mutation({
+  args: {
+    // user_id: v.id("user"),
+    venue_id: v.id("venues"),
+    booking_date: v.string(),
+    start_time: v.string(),
+    hours: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+      // return null
+    }
+    const user = await ctx.db.query("users").withIndex("by_token", (q) =>
+      q.eq("tokenIdentifier", identity.tokenIdentifier)
+    ).unique();
+    if (!user) {
+      throw new Error("User not found");
+    }
+    return await ctx.db.insert("bookings", {
+      user_id: user?._id,
+      venue_id: args.venue_id,
+      booking_date: args.booking_date,
+      start_time: args.start_time,
+      hours: args.hours,
+    });
+  }
+})

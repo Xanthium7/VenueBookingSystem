@@ -16,20 +16,20 @@ export default defineSchema({
     type: v.string(),
   }),
   bookings: defineTable({
-    user_id: v.id("user"),
+    user_id: v.id("users"),
     venue_id: v.id("venues"),
     booking_date: v.string(),
     start_time: v.string(),
     hours: v.number(),
   }),
   feedback: defineTable({
-    user_id: v.id("user"),
+    user_id: v.id("users"),
     venue_id: v.id("venues"),
     rating: v.number(),
     comment: v.string(),
   }),
   notices: defineTable({
-    user_id: v.id("user"),
+    user_id: v.id("users"),
     title: v.string(),
     message: v.string(),
   }),
