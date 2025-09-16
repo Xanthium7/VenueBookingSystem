@@ -34,8 +34,8 @@ export function Navbar() {
             >
               Explore
             </Link>
-            <Link href="#about" className="hover:opacity-70 transition-colors">
-              About
+            <Link href="/my-bookings" className="hover:opacity-70 transition-colors">
+              My Bookings
             </Link>
           </nav>
           <div className="flex items-center gap-4">
