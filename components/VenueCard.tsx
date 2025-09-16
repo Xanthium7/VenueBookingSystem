@@ -6,6 +6,7 @@ import type { Id } from "@/convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useState } from "react";
+import { Venue } from "@/components/booking/types";
 import {
   Dialog,
   DialogContent,
@@ -18,18 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 
-// Unified venue shape to support both server (Convex) data and legacy placeholder data
-export interface Venue {
-  _id: Id<"venues">;
-  venue_name: string;
-  venue_image?: Id<"_storage">;
-  imageUrl?: string | null;
-  venue_description: string;
-  location: string;
-  type: string;
-  capacity: number;
-  _creationTime: number;
-}
+// Venue interface moved to components/booking/types.ts
 
 // removed invalid top-level hook usage
 
@@ -41,7 +31,9 @@ export function VenueCard({
   layout: "grid" | "list";
 }) {
   const [open, setOpen] = useState(false);
-  const [bookingDate, setBookingDate] = useState<string>(new Date().toISOString().slice(0, 10)); // YYYY-MM-DD
+  const [bookingDate, setBookingDate] = useState<string>(
+    new Date().toISOString().slice(0, 10)
+  ); // YYYY-MM-DD
   const [startTime, setStartTime] = useState<string>("09:00");
   const [hours, setHours] = useState<number>(1);
   const [isBooking, setIsBooking] = useState(false);
@@ -163,7 +155,8 @@ export function VenueCard({
                   />
                 </div>
                 <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                  Past dates are disabled. Add validation for availability later.
+                  Past dates are disabled. Add validation for availability
+                  later.
                 </p>
               </div>
               <DialogFooter>
