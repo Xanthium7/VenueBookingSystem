@@ -7,9 +7,11 @@ import { BookingItem } from "./types";
 export function BookingCard({
   booking,
   layout,
+  onDelete,
 }: {
   booking: BookingItem;
   layout: "grid" | "list";
+  onDelete?: (id: BookingItem["id"]) => void;
 }) {
   return (
     <div
@@ -86,11 +88,11 @@ export function BookingCard({
           )}
           <Button
             size="sm"
-            className="rounded-full"
-            variant="secondary"
-            onClick={() => alert("View details (wire backend)")}
+            className="rounded-full bg-red-600/80"
+            variant="destructive"
+            onClick={() => onDelete?.(booking.id)}
           >
-            View
+            Cancel Booking
           </Button>
         </div>
       </div>

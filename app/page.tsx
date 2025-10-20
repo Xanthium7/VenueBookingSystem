@@ -23,7 +23,7 @@ export default function Home() {
           </div>
         </div>
       )}
-      <Navbar />
+      {/* <Navbar /> */}
       <main className="flex-1">
         {isAuthenticated && (
           <>

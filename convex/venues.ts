@@ -120,3 +120,38 @@ export const getBookingsForUser = query({
     return bookings;
   },
 });
+
+export const deleteBooking = mutation({
+  args: {
+    booking_id: v.id("bookings"),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier)
+      )
+      .unique();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const booking = await ctx.db.get(args.booking_id);
+    if (!booking) {
+      throw new Error("Booking not found");
+    }
+
+    if (booking.user_id !== user._id) {
+      throw new Error("Not authorized to delete this booking");
+    }
+
+    await ctx.db.delete(args.booking_id);
+    return args.booking_id;
+  },
+});

@@ -3,20 +3,13 @@ import Link from "next/link";
 import { Authenticated, Unauthenticated } from "convex/react";
 import { Button } from "@/components/ui/button";
 import { UserButton } from "@clerk/nextjs";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+
 import { AddVenue } from "./AddVenue";
 
 export function Navbar() {
   return (
     <>
-      <header className="sticky top-0 z-40 bg-black/10  backdrop-blur-xl border-b-[1px] border-white/20 shadow-[0_4px_30px_rgba(0,0,0,0.05)]">
+      <header className="sticky top-0 z-40 bg-black/70   backdrop-blur-xl border-b-[1px] border-white/60 shadow-[0_4px_30px_rgba(0,0,0,0.05)]">
         <div className="mx-auto max-w-7xl px-5 h-16 flex items-center justify-between gap-6 text-white/80">
           <Link
             href="/"
@@ -25,7 +18,7 @@ export function Navbar() {
             Vebe
           </Link>
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-            <Link href="#venues" className="hover:opacity-70 transition-colors">
+            <Link href="/" className="hover:opacity-70 transition-colors">
               Venues
             </Link>
             <Link
@@ -34,7 +27,10 @@ export function Navbar() {
             >
               Explore
             </Link>
-            <Link href="/my-bookings" className="hover:opacity-70 transition-colors">
+            <Link
+              href="/my-bookings"
+              className="hover:opacity-70 transition-colors"
+            >
               My Bookings
             </Link>
           </nav>

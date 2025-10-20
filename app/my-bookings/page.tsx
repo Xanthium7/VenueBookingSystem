@@ -1,9 +1,8 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { BookingItem } from "@/components/booking/types";
 import { StatusSelect } from "@/components/booking/StatusSelect";
@@ -21,6 +20,7 @@ export default function MyBookingsPage() {
   // Queries (undefined while loading)
   const bookings = useQuery(api.venues.getBookingsForUser);
   const venues = useQuery(api.venues.getVenues);
+  const deleteBookingMutation = useMutation(api.venues.deleteBooking);
   const isLoading = bookings === undefined || venues === undefined;
 
   // Build a quick lookup for venues
@@ -64,6 +64,17 @@ export default function MyBookingsPage() {
       return matchesQuery && matchesStatus;
     });
   }, [query, status, derived]);
+
+  const handleDelete = useCallback(
+    async (bookingId: BookingItem["id"]) => {
+      try {
+        await deleteBookingMutation({ booking_id: bookingId });
+      } catch (error) {
+        console.error("Failed to delete booking", error);
+      }
+    },
+    [deleteBookingMutation]
+  );
 
   return (
     <main className="mx-auto max-w-7xl px-5 py-16">
@@ -109,11 +120,15 @@ export default function MyBookingsPage() {
           )}
         >
           {filtered.map((b) => (
-            <BookingCard key={b.id} booking={b} layout={view} />
+            <BookingCard
+              key={b.id}
+              booking={b}
+              layout={view}
+              onDelete={handleDelete}
+            />
           ))}
         </div>
       )}
     </main>
   );
 }
-

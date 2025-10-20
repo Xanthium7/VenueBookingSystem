@@ -1,5 +1,7 @@
+import type { Id } from "@/convex/_generated/dataModel";
+
 export interface BookingItem {
-  id: string;
+  id: Id<"bookings">;
   venueName: string;
   venueImage: string;
   date: string;
@@ -10,7 +12,6 @@ export interface BookingItem {
 }
 
 // Venue interface shared across components (originally in VenueCard.tsx)
-import type { Id } from "@/convex/_generated/dataModel";
 export interface Venue {
   _id: Id<"venues">;
   venue_name: string;
