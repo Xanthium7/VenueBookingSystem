@@ -22,7 +22,9 @@ export default defineSchema({
     booking_date: v.string(),
     start_time: v.string(),
     hours: v.number(),
-  }).index("by_user", ["user_id"]),
+  })
+    .index("by_user", ["user_id"])
+    .index("by_venue", ["venue_id"]),
   feedback: defineTable({
     user_id: v.id("users"),
     venue_id: v.id("venues"),

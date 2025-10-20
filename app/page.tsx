@@ -8,6 +8,7 @@ import { Footer } from "@/components/Footer";
 import { useStoreUserEffect } from "@/hooks/useStoreUserEffect";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Toaster } from "react-hot-toast";
 
 export default function Home() {
   const { isLoading, isAuthenticated } = useStoreUserEffect();
@@ -34,6 +35,10 @@ export default function Home() {
         )}
       </main>
       <Footer />
+      <Toaster
+  position="top-center"
+  reverseOrder={false}
+/>
     </div>
   );
 }

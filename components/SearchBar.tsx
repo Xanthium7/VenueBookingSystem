@@ -7,8 +7,8 @@ export function SearchBar() {
       <div className="flex-1">
         <div className="mt-1 flex rounded-xl h-11 overflow-hidden border border-white/40  bg-black/20  backdrop-blur px-3 focus-within:ring-2 focus-within:ring-neutral-900/40  transition">
           <input
-            placeholder="Search a city or country..."
-            className="w-full bg-transparent py-2 text-sm outline-none placeholder:text-white/80"
+            placeholder="Search your venue..."
+            className="w-full bg-transparent py-2 text-sm outline-none placeholder:text-white/80 placeholder:font-light"
           />
         </div>
       </div>

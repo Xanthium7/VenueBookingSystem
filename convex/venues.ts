@@ -1,6 +1,32 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
+const timeToMinutes = (time: string): number => {
+  const [hoursStr, minutesStr] = time.split(":");
+  const hours = Number(hoursStr);
+  const minutes = Number(minutesStr);
+  if (
+    Number.isNaN(hours) ||
+    Number.isNaN(minutes) ||
+    hours < 0 ||
+    hours > 23 ||
+    minutes < 0 ||
+    minutes > 59
+  ) {
+    throw new Error("Invalid time format. Expected HH:MM in 24-hour format.");
+  }
+  return hours * 60 + minutes;
+};
+
+const minutesToTime = (totalMinutes: number): string => {
+  const normalized = Math.max(0, totalMinutes);
+  const hours = Math.floor(normalized / 60) % 24;
+  const minutes = normalized % 60;
+  return `${hours.toString().padStart(2, "0")}:${minutes
+    .toString()
+    .padStart(2, "0")}`;
+};
+
 export const generateUploadUrl = mutation({
   handler: async (ctx) => {
     return await ctx.storage.generateUploadUrl();
@@ -65,7 +91,6 @@ export const deleteVenue = mutation({
 
 export const bookVenue = mutation({
   args: {
-    // user_id: v.id("user"),
     venue_id: v.id("venues"),
     booking_date: v.string(),
     start_time: v.string(),
@@ -75,19 +100,45 @@ export const bookVenue = mutation({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Not authenticated");
-      // return null
     }
+
     const user = await ctx.db
       .query("users")
       .withIndex("by_token", (q) =>
         q.eq("tokenIdentifier", identity.tokenIdentifier)
       )
       .unique();
+
     if (!user) {
       throw new Error("User not found");
     }
+
+    const requestedStart = timeToMinutes(args.start_time);
+    const requestedEnd = requestedStart + args.hours * 60;
+
+    const existingBookings = await ctx.db
+      .query("bookings")
+      .withIndex("by_venue", (q) => q.eq("venue_id", args.venue_id))
+      .collect();
+
+    const hasOverlap = existingBookings.some((booking) => {
+      if (booking.booking_date !== args.booking_date) {
+        return false;
+      }
+
+      const existingStart = timeToMinutes(booking.start_time);
+      const existingEnd = existingStart + booking.hours * 60;
+      return requestedStart < existingEnd && requestedEnd > existingStart;
+    });
+
+    if (hasOverlap) {
+      throw new Error(
+        "This venue is already booked for the selected time slot."
+      );
+    }
+
     return await ctx.db.insert("bookings", {
-      user_id: user?._id,
+      user_id: user._id,
       venue_id: args.venue_id,
       booking_date: args.booking_date,
       start_time: args.start_time,
@@ -102,22 +153,53 @@ export const getBookingsForUser = query({
     if (!identity) {
       throw new Error("Not authenticated");
     }
+
     const user = await ctx.db
       .query("users")
       .withIndex("by_token", (q) =>
         q.eq("tokenIdentifier", identity.tokenIdentifier)
       )
       .unique();
+
     if (!user) {
       throw new Error("User not found");
     }
 
     const bookings = await ctx.db
       .query("bookings")
-      .withIndex("by_user", (q) => q.eq("user_id", user?._id))
+      .withIndex("by_user", (q) => q.eq("user_id", user._id))
       .collect();
 
     return bookings;
+  },
+});
+
+export const getBookedSlotsForVenue = query({
+  args: {
+    venue_id: v.id("venues"),
+    booking_date: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const bookings = await ctx.db
+      .query("bookings")
+      .withIndex("by_venue", (q) => q.eq("venue_id", args.venue_id))
+      .collect();
+
+    const filtered = args.booking_date
+      ? bookings.filter((booking) => booking.booking_date === args.booking_date)
+      : bookings;
+
+    return filtered.map((booking) => {
+      const startMinutes = timeToMinutes(booking.start_time);
+      const endMinutes = startMinutes + booking.hours * 60;
+
+      return {
+        booking_date: booking.booking_date,
+        start_time: booking.start_time,
+        end_time: minutesToTime(endMinutes % (24 * 60)),
+        hours: booking.hours,
+      };
+    });
   },
 });
 
