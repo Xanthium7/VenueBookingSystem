@@ -98,3 +98,33 @@ export const getFeedbackForUser = query({
       .collect();
   },
 });
+
+export const getRecentFeedbackForVenue = query({
+  args: {
+    venue_id: v.id("venues"),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const limit = Math.max(1, Math.min(args.limit ?? 5, 10));
+
+    const feedbackEntries = await ctx.db
+      .query("feedback")
+      .withIndex("by_venue", (q) => q.eq("venue_id", args.venue_id))
+      .order("desc")
+      .take(limit);
+
+    return Promise.all(
+      feedbackEntries.map(async (entry) => {
+        const user = await ctx.db.get(entry.user_id);
+        return {
+          _id: entry._id,
+          rating: entry.rating,
+          comment: entry.comment,
+          userId: entry.user_id,
+          userName: user?.name ?? "Anonymous",
+          createdAt: entry._creationTime,
+        };
+      })
+    );
+  },
+});

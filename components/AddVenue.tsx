@@ -59,7 +59,10 @@ export function AddVenue() {
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="outline" className="text-black/80 cursor-pointer">
+        <Button
+          variant="outline"
+          className="text-black/80 cursor-pointer font-medium uppercase"
+        >
           Add venue
         </Button>
       </DialogTrigger>

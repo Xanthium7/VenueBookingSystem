@@ -23,7 +23,7 @@ type UserFeedbackRecord = {
 export default function MyBookingsPage() {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<string>("all");
-  const [view, setView] = useState<"list" | "grid">("list");
+  const [view, setView] = useState<"list" | "grid">("grid");
   // Queries (undefined while loading)
   const bookings = useQuery(api.venues.getBookingsForUser);
   const venues = useQuery(api.venues.getVenues);

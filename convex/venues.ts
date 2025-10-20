@@ -37,12 +37,29 @@ export const getVenues = query({
   handler: async (ctx) => {
     const venues = await ctx.db.query("venues").collect();
     return Promise.all(
-      venues.map(async (venue) => ({
-        ...venue,
-        ...(venue.venue_image
-          ? { imageUrl: await ctx.storage.getUrl(venue.venue_image) }
-          : {}),
-      }))
+      venues.map(async (venue) => {
+        const feedbackEntries = await ctx.db
+          .query("feedback")
+          .withIndex("by_venue", (q) => q.eq("venue_id", venue._id))
+          .collect();
+
+        const ratingSum = feedbackEntries.reduce(
+          (sum, feedback) => sum + feedback.rating,
+          0
+        );
+        const averageRating =
+          feedbackEntries.length > 0
+            ? Number((ratingSum / feedbackEntries.length).toFixed(1))
+            : null;
+
+        return {
+          ...venue,
+          ...(venue.venue_image
+            ? { imageUrl: await ctx.storage.getUrl(venue.venue_image) }
+            : {}),
+          averageRating,
+        };
+      })
     );
   },
 });
@@ -75,6 +92,22 @@ export const deleteVenue = mutation({
     venue_id: v.id("venues"),
   },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier)
+      )
+      .unique();
+
+    if (!user || user.role !== "admin") {
+      throw new Error("Not authorized to delete venues");
+    }
+
     const venue = await ctx.db.get(args.venue_id);
     if (!venue) {
       throw new Error("Venue not found");
@@ -83,6 +116,22 @@ export const deleteVenue = mutation({
     if (venue.venue_image) {
       await ctx.storage.delete(venue.venue_image);
     }
+
+    const bookings = await ctx.db
+      .query("bookings")
+      .withIndex("by_venue", (q) => q.eq("venue_id", args.venue_id))
+      .collect();
+
+    await Promise.all(bookings.map((booking) => ctx.db.delete(booking._id)));
+
+    const feedbackEntries = await ctx.db
+      .query("feedback")
+      .withIndex("by_venue", (q) => q.eq("venue_id", args.venue_id))
+      .collect();
+
+    await Promise.all(
+      feedbackEntries.map((feedback) => ctx.db.delete(feedback._id))
+    );
 
     await ctx.db.delete(args.venue_id);
     return args.venue_id;

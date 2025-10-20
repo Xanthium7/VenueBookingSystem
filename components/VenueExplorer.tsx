@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import type { Venue } from "./VenueCard";
+import type { Venue } from "@/components/booking/types";
 import { VenueCard } from "./VenueCard";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";

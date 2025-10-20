@@ -36,7 +36,9 @@ export const store = mutation({
 export const getCurrentUserRole = query({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
+    if (!identity) {
+      return null;
+    }
 
     const user = await ctx.db
       .query("users")
@@ -45,7 +47,9 @@ export const getCurrentUserRole = query({
       )
       .unique();
 
-    if (!user) throw new Error("User not found");
+    if (!user) {
+      return null;
+    }
 
     return {
       userId: user._id,

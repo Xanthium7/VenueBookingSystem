@@ -9,15 +9,15 @@ import { AddVenue } from "./AddVenue";
 export function Navbar() {
   return (
     <>
-      <header className="sticky top-0 z-40 bg-black/70   backdrop-blur-xl border-b-[1px] border-white/60 shadow-[0_4px_30px_rgba(0,0,0,0.05)]">
+      <header className="sticky top-0 z-40 bg-gradient-to-tr from-neutral-950/90 via-neutral-900/80 to-neutral-900/80 backdrop-blur-xl border-b-[1px] border-white/60 shadow-[0_4px_30px_rgba(0,0,0,0.05)]">
         <div className="mx-auto max-w-7xl px-5 h-16 flex items-center justify-between gap-6 text-white/80">
           <Link
             href="/"
-            className="text-2xl  tracking-tight text-white font-medium"
+            className="text-2xl  tracking-tight text-white font-light"
           >
-            Vebe
+            V E B E
           </Link>
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
+          <nav className="hidden md:flex items-center gap-8 text-sm font-light uppercase ">
             <Link href="/" className="hover:opacity-70 transition-colors">
               Venues
             </Link>

@@ -32,7 +32,8 @@ export default defineSchema({
     comment: v.string(),
   })
     .index("by_user", ["user_id"])
-    .index("by_user_venue", ["user_id", "venue_id"]),
+    .index("by_user_venue", ["user_id", "venue_id"])
+    .index("by_venue", ["venue_id"]),
   notices: defineTable({
     user_id: v.id("users"),
     title: v.string(),

@@ -30,4 +30,5 @@ export interface Venue {
   type: string;
   capacity: number;
   _creationTime: number;
+  averageRating?: number | null;
 }
