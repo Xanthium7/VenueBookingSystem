@@ -44,6 +44,25 @@ export const addVenue = mutation({
   },
 });
 
+export const deleteVenue = mutation({
+  args: {
+    venue_id: v.id("venues"),
+  },
+  handler: async (ctx, args) => {
+    const venue = await ctx.db.get(args.venue_id);
+    if (!venue) {
+      throw new Error("Venue not found");
+    }
+
+    if (venue.venue_image) {
+      await ctx.storage.delete(venue.venue_image);
+    }
+
+    await ctx.db.delete(args.venue_id);
+    return args.venue_id;
+  },
+});
+
 export const bookVenue = mutation({
   args: {
     // user_id: v.id("user"),
@@ -58,9 +77,12 @@ export const bookVenue = mutation({
       throw new Error("Not authenticated");
       // return null
     }
-    const user = await ctx.db.query("users").withIndex("by_token", (q) =>
-      q.eq("tokenIdentifier", identity.tokenIdentifier)
-    ).unique();
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier)
+      )
+      .unique();
     if (!user) {
       throw new Error("User not found");
     }
@@ -71,27 +93,30 @@ export const bookVenue = mutation({
       start_time: args.start_time,
       hours: args.hours,
     });
-  }
-})
+  },
+});
 
 export const getBookingsForUser = query({
-  
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Not authenticated");
     }
-    const user = await ctx.db.query("users").withIndex("by_token", (q) =>
-      q.eq("tokenIdentifier", identity.tokenIdentifier)
-    ).unique();
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier)
+      )
+      .unique();
     if (!user) {
       throw new Error("User not found");
     }
 
-    const bookings = await ctx.db.query("bookings").withIndex("by_user", (q) =>
-      q.eq("user_id", user?._id)
-    ).collect();
+    const bookings = await ctx.db
+      .query("bookings")
+      .withIndex("by_user", (q) => q.eq("user_id", user?._id))
+      .collect();
 
     return bookings;
-  }
-})
+  },
+});

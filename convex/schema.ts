@@ -32,5 +32,5 @@ export default defineSchema({
     user_id: v.id("users"),
     title: v.string(),
     message: v.string(),
-  }),
+  }).index("by_user", ["user_id"]),
 });
