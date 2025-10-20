@@ -28,7 +28,9 @@ export default defineSchema({
     venue_id: v.id("venues"),
     rating: v.number(),
     comment: v.string(),
-  }),
+  })
+    .index("by_user", ["user_id"])
+    .index("by_user_venue", ["user_id", "venue_id"]),
   notices: defineTable({
     user_id: v.id("users"),
     title: v.string(),

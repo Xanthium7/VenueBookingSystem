@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { BookingItem } from "@/components/booking/types";
+import { BookingItem, BookingFeedback } from "@/components/booking/types";
 import { StatusSelect } from "@/components/booking/StatusSelect";
 import { ToggleBtn } from "@/components/booking/ToggleBtn";
 import { SkeletonList } from "@/components/booking/SkeletonList";
@@ -13,6 +13,13 @@ import { BookingCard } from "@/components/booking/BookingCard";
 
 // BookingItem type moved to components/booking/types.ts
 
+type UserFeedbackRecord = {
+  _id: BookingFeedback["id"];
+  venue_id: BookingItem["venueId"];
+  rating: number;
+  comment: string;
+};
+
 export default function MyBookingsPage() {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<string>("all");
@@ -20,8 +27,12 @@ export default function MyBookingsPage() {
   // Queries (undefined while loading)
   const bookings = useQuery(api.venues.getBookingsForUser);
   const venues = useQuery(api.venues.getVenues);
+  const feedbacks = useQuery(api.feedback.getFeedbackForUser);
   const deleteBookingMutation = useMutation(api.venues.deleteBooking);
-  const isLoading = bookings === undefined || venues === undefined;
+  const submitFeedbackMutation = useMutation(api.feedback.submitFeedback);
+  const updateFeedbackMutation = useMutation(api.feedback.updateFeedback);
+  const isLoading =
+    bookings === undefined || venues === undefined || feedbacks === undefined;
 
   // Build a quick lookup for venues
   const venueMap = useMemo(() => {
@@ -30,18 +41,32 @@ export default function MyBookingsPage() {
     return m;
   }, [venues]);
 
+  const feedbackMap = useMemo(() => {
+    const m = new Map<BookingItem["venueId"], UserFeedbackRecord>();
+    (feedbacks ?? []).forEach((f) => {
+      const record = f as UserFeedbackRecord;
+      m.set(record.venue_id, record);
+    });
+    return m;
+  }, [feedbacks]);
+
   // Transform raw bookings into BookingItem objects
   const derived: BookingItem[] = useMemo(() => {
     if (!bookings) return [];
     const now = Date.now();
-    return bookings.map((b: any) => {
+
+    const enriched = bookings.map((b: any) => {
       const venue = venueMap.get(b.venue_id);
       const startTs = Date.parse(`${b.booking_date}T${b.start_time}:00`);
       const endTs = startTs + b.hours * 60 * 60 * 1000;
       let statusLabel: BookingItem["status"] = "upcoming";
       if (now > endTs) statusLabel = "completed";
-      return {
+
+      const feedback = feedbackMap.get(b.venue_id);
+
+      const base: BookingItem = {
         id: b._id,
+        venueId: b.venue_id,
         venueName: venue?.venue_name ?? "Unknown Venue",
         venueImage: venue?.imageUrl ?? "/window.svg",
         date: b.booking_date,
@@ -49,9 +74,22 @@ export default function MyBookingsPage() {
         hours: b.hours,
         status: statusLabel,
         location: venue?.location ?? "-",
-      } as BookingItem;
+        feedback: feedback
+          ? {
+              id: feedback._id,
+              rating: feedback.rating,
+              comment: feedback.comment,
+            }
+          : undefined,
+      };
+
+      return { booking: base, startTimestamp: startTs };
     });
-  }, [bookings, venueMap]);
+
+    enriched.sort((a, b) => b.startTimestamp - a.startTimestamp);
+
+    return enriched.map((entry) => entry.booking);
+  }, [bookings, venueMap, feedbackMap]);
 
   // Apply filters
   const filtered = useMemo(() => {
@@ -74,6 +112,56 @@ export default function MyBookingsPage() {
       }
     },
     [deleteBookingMutation]
+  );
+
+  const handleSubmitFeedback = useCallback(
+    async ({
+      bookingId: _bookingId,
+      venueId,
+      rating,
+      comment,
+    }: {
+      bookingId: BookingItem["id"];
+      venueId: BookingItem["venueId"];
+      rating: number;
+      comment: string;
+    }) => {
+      try {
+        await submitFeedbackMutation({
+          venue_id: venueId,
+          rating,
+          comment,
+        });
+      } catch (error) {
+        console.error("Failed to submit feedback", error);
+        throw error;
+      }
+    },
+    [submitFeedbackMutation]
+  );
+
+  const handleUpdateFeedback = useCallback(
+    async ({
+      feedbackId,
+      rating,
+      comment,
+    }: {
+      feedbackId: BookingFeedback["id"];
+      rating: number;
+      comment: string;
+    }) => {
+      try {
+        await updateFeedbackMutation({
+          feedback_id: feedbackId,
+          rating,
+          comment,
+        });
+      } catch (error) {
+        console.error("Failed to update feedback", error);
+        throw error;
+      }
+    },
+    [updateFeedbackMutation]
   );
 
   return (
@@ -125,6 +213,8 @@ export default function MyBookingsPage() {
               booking={b}
               layout={view}
               onDelete={handleDelete}
+              onSubmitFeedback={handleSubmitFeedback}
+              onUpdateFeedback={handleUpdateFeedback}
             />
           ))}
         </div>
