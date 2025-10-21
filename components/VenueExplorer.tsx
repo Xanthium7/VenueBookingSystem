@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { Venue } from "@/components/booking/types";
 import { VenueCard } from "./VenueCard";
@@ -8,8 +9,29 @@ import { api } from "@/convex/_generated/api";
 
 export function VenueExplorer() {
   const [view, setView] = useState<"grid" | "list">("grid");
+  const params = useSearchParams();
+  const searchQuery = params?.get("query")?.toLowerCase().trim() ?? "";
+
   const serverVenues = useQuery(api.venues.getVenues);
   const data: Venue[] = (serverVenues ?? []) as Venue[];
+
+  const filteredVenues = useMemo(() => {
+    if (!searchQuery) {
+      return data;
+    }
+    return data.filter((venue) => {
+      const haystacks = [
+        venue.venue_name,
+        venue.location,
+        venue.type,
+        venue.venue_description,
+      ]
+        .filter(Boolean)
+        .map((value) => value.toLowerCase());
+
+      return haystacks.some((value) => value.includes(searchQuery));
+    });
+  }, [data, searchQuery]);
 
   return (
     <section id="venues" className="mx-auto max-w-7xl px-5 py-20">
@@ -46,9 +68,14 @@ export function VenueExplorer() {
             : "space-y-6"
         )}
       >
-        {data.map((v) => (
+        {filteredVenues.map((v) => (
           <VenueCard key={v._id} venue={v} layout={view} />
         ))}
+        {!filteredVenues.length && (
+          <p className="col-span-full text-center text-sm text-neutral-500 dark:text-neutral-400">
+            No venues match “{searchQuery}”. Try a different keyword.
+          </p>
+        )}
       </div>
     </section>
   );

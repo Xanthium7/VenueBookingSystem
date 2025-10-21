@@ -1,12 +1,16 @@
 "use client";
 import Link from "next/link";
-import { Authenticated, Unauthenticated } from "convex/react";
+import { Authenticated, Unauthenticated, useQuery } from "convex/react";
 import { Button } from "@/components/ui/button";
 import { UserButton } from "@clerk/nextjs";
+import { api } from "@/convex/_generated/api";
 
 import { AddVenue } from "./AddVenue";
 
 export function Navbar() {
+  const currentUserRole = useQuery(api.users.getCurrentUserRole);
+  const isAdmin = currentUserRole?.role === "admin";
+
   return (
     <>
       <header className="sticky  top-0 z-40 bg-gradient-to-tr from-black/95 via-neutral-900/90 to-neutral-900/80 backdrop-blur-xl border-b-[1px] border-white/60 shadow-[0_4px_30px_rgba(0,0,0,0.05)]">
@@ -33,7 +37,7 @@ export function Navbar() {
           </nav>
           <div className="flex items-center gap-4">
             <Authenticated>
-              <AddVenue />
+              {isAdmin && <AddVenue />}
               <UserButton
                 appearance={{ elements: { userButtonBox: "text-white/80" } }}
               />
