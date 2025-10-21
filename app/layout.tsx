@@ -33,7 +33,6 @@ export default function RootLayout({
       >
         <ClerkProvider>
           <ConvexClientProvider>
-            <Toaster position="top-right" />
             <Navbar></Navbar>
             {children}
           </ConvexClientProvider>

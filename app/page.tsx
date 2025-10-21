@@ -5,6 +5,7 @@ import { Hero } from "@/components/Hero";
 import { HotVenues } from "@/components/HotVenues";
 import { VenueExplorer } from "@/components/VenueExplorer";
 import { Footer } from "@/components/Footer";
+import { NotificationFooter } from "@/components/NotificationFooter";
 import { useStoreUserEffect } from "@/hooks/useStoreUserEffect";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -24,8 +25,8 @@ export default function Home() {
           </div>
         </div>
       )}
-      
-      <main className="flex-1">
+
+      <main className="flex-1 pb-24">
         {isAuthenticated && (
           <>
             <Hero />
@@ -35,10 +36,8 @@ export default function Home() {
         )}
       </main>
       <Footer />
-      <Toaster
-  position="top-center"
-  reverseOrder={false}
-/>
+      {isAuthenticated && <NotificationFooter />}
+      <Toaster position="top-center" reverseOrder={false} />
     </div>
   );
 }

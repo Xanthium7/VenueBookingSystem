@@ -22,14 +22,24 @@ const getAuthenticatedUser = async (ctx: QueryCtx | MutationCtx) => {
   return user;
 };
 
-export const getNotices = query({
-  handler: async (ctx) => {
-    const user = await getAuthenticatedUser(ctx);
+export const getLatestNotices = query({
+  args: {
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const limit = Math.max(1, Math.min(args.limit ?? 3, 10));
 
-    return await ctx.db
-      .query("notices")
-      .withIndex("by_user", (q) => q.eq("user_id", user._id))
-      .collect();
+    const notices = await ctx.db.query("notices").order("desc").take(limit);
+
+    return Promise.all(
+      notices.map(async (notice) => {
+        const author = await ctx.db.get(notice.user_id);
+        return {
+          ...notice,
+          authorName: author?.name ?? "Admin",
+        };
+      })
+    );
   },
 });
 
@@ -40,6 +50,10 @@ export const addNotice = mutation({
   },
   handler: async (ctx, args) => {
     const user = await getAuthenticatedUser(ctx);
+
+    if ((user.role ?? "user") !== "admin") {
+      throw new Error("Not authorized to create notices");
+    }
 
     return await ctx.db.insert("notices", {
       user_id: user._id,
@@ -56,16 +70,43 @@ export const deleteNotice = mutation({
   handler: async (ctx, args) => {
     const user = await getAuthenticatedUser(ctx);
 
+    if ((user.role ?? "user") !== "admin") {
+      throw new Error("Not authorized to delete notices");
+    }
+
     const notice = await ctx.db.get(args.notice_id);
     if (!notice) {
       throw new Error("Notice not found");
     }
 
-    if (notice.user_id !== user._id) {
-      throw new Error("Not authorized to delete this notice");
+    await ctx.db.delete(args.notice_id);
+    return args.notice_id;
+  },
+});
+
+export const updateNotice = mutation({
+  args: {
+    notice_id: v.id("notices"),
+    title: v.string(),
+    message: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await getAuthenticatedUser(ctx);
+
+    if ((user.role ?? "user") !== "admin") {
+      throw new Error("Not authorized to update notices");
     }
 
-    await ctx.db.delete(args.notice_id);
+    const notice = await ctx.db.get(args.notice_id);
+    if (!notice) {
+      throw new Error("Notice not found");
+    }
+
+    await ctx.db.patch(args.notice_id, {
+      title: args.title,
+      message: args.message,
+    });
+
     return args.notice_id;
   },
 });
