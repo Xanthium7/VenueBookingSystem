@@ -5,7 +5,7 @@ import type { Venue } from "@/components/booking/types";
 
 export function HotVenues({ venues }: { venues?: Venue[] }) {
   const list = venues ?? [];
-  const hot = [...list].slice(0, 3);
+  const hot = [...list].slice(0, 4);
 
   return (
     <section className="relative -mt-10 md:-mt-16 z-10">
@@ -31,7 +31,7 @@ export function HotVenues({ venues }: { venues?: Venue[] }) {
             </div>
           </div>
           <div
-            className="flex gap-6 overflow-x-auto pb-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700"
+            className="flex gap-6 justify-around overflow-x-auto pb-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700"
             role="list"
           >
             {hot.map((v) => (

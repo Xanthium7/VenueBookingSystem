@@ -26,13 +26,15 @@ export default function Page() {
             style={{ backgroundImage: `url(${bannerImageUrl})` }}
           />
           <div className="absolute inset-0 bg-gradient-to-br from-black via-black/80 to-black/60" />
-          <div className="relative flex h-full w-full flex-col items-center justify-center gap-8 p-12 text-center">
-            <p className="text-5xl uppercase tracking-[0.2em] text-neutral-300">
-              VEBE
+          <div className="relative flex h-full flex-col justify-between p-12">
+            <p className="text-xl uppercase tracking-[0.1em] pt-10 text-neutral-200">
+              V E B E
             </p>
-            <h1 className="max-w-md text-4xl font-light leading-tight">
-              Join a community of minimalist venue curators.
-            </h1>
+            <div className=" w-full h-full flex justify-center items-center flex-col">
+              <h1 className="mt-6 max-w-md text-4xl font-light leading-tight  mx-auto">
+                Create unforgettable experiences in minimalist spaces.
+              </h1>
+            </div>
             <p className="text-sm text-neutral-500">
               Tailored venues for every vision. Curated with intention.
             </p>

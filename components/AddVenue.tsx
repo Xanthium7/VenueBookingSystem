@@ -66,7 +66,7 @@ export function AddVenue() {
           Add venue
         </Button>
       </DialogTrigger>
-  <DialogContent className="sm:max-w-[425px] max-h-[70vh] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <DialogContent className="sm:max-w-[425px] max-h-[70vh] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <form
           onSubmit={async (e: FormEvent) => {
             e.preventDefault();

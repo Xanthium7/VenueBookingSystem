@@ -27,7 +27,7 @@ export default function Page() {
         />
         <div className="absolute inset-0 bg-gradient-to-br from-black via-black/80 to-black/60" />
         <div className="relative flex h-full flex-col justify-between p-12">
-          <p className="text-xl uppercase tracking-[0.1em] text-neutral-200">
+          <p className="text-xl uppercase tracking-[0.1em] text-neutral-200 pt-10">
               V E B E
             </p>
           <div className=" w-full h-full flex justify-center items-center flex-col">
