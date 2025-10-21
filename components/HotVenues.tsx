@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { StarRating } from "./StarRating";
 import type { Venue } from "@/components/booking/types";
+import { VenueBookingDialog } from "@/components/VenueBookingDialog";
 
 export function HotVenues({ venues }: { venues?: Venue[] }) {
   const list = venues ?? [];
@@ -72,9 +73,14 @@ export function HotVenues({ venues }: { venues?: Venue[] }) {
                     <span className="text-neutral-700 dark:text-neutral-300">
                       {v.type}
                     </span>
-                    <Button size="sm" className="rounded-full px-4 h-8">
-                      Book
-                    </Button>
+                    <VenueBookingDialog
+                      venue={v}
+                      trigger={
+                        <Button size="sm" className="rounded-full px-4 h-8">
+                          Book
+                        </Button>
+                      }
+                    />
                   </div>
                 </div>
               </div>
