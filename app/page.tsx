@@ -13,7 +13,7 @@ import { Toaster } from "react-hot-toast";
 export default function Home() {
   const { isLoading, isAuthenticated } = useStoreUserEffect();
   const serverVenues = useQuery(api.venues.getVenues);
-  console.log("serverVenues", serverVenues);
+  // console.log("serverVenues", serverVenues);
 
   return (
     <div className="min-h-screen flex flex-col bg-neutral-100 text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100 font-sans">
@@ -24,7 +24,7 @@ export default function Home() {
           </div>
         </div>
       )}
-      {/* <Navbar /> */}
+      
       <main className="flex-1">
         {isAuthenticated && (
           <>
