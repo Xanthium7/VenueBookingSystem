@@ -19,6 +19,14 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Vebe - Venue Booking System",
   description: "You have venue, but no booking? ",
+  icons: {
+    icon: [
+      {
+        url: "/favicon.ico",
+        type: "image/x-icon",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({
